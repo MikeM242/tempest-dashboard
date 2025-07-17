@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Tempest Station</title>
+  <style>
+    body { font-family: sans-serif; margin: 1rem; background: #eef2f5; color: #333; }
+    .card { background: white; padding: 1rem; max-width: 400px; margin: auto;
+            border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    h2 { margin-top: 0; }
+    .stat { display: flex; justify-content: space-between; padding: 0.5rem 0; }
+    .label { color: #555; }
+    .value { font-weight: bold; }
+    .timestamp { text-align: center; font-size: 0.9rem; color: #777; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Station 34509 Current Conditions</h2>
+    <div id="stats">
+      <!-- Stats get filled in here -->
+    </div>
+    <div id="updated" class="timestamp">Last updated: —</div>
+  </div>
+
+  <script>
+    const token = '6e0530d0-40ff-42d6-a258-357526e2be11';
+    const stationId = '34509';
+
+    async function fetchCurrent() {
+      try {
+        const resp = await fetch(
+          `https://swd.weatherflow.com/swd/rest/observations/station/${stationId}?token=${token}&units_temp=f&units_wind=mph&units_pressure=inHg`
+        );
+        const data = await resp.json();
+        const obs = data.obs[0];
+        if (!obs) throw new Error('No observation data');
+
+        const stats = {
+          'Temperature': `${obs.air_temperature.toFixed(1)} °F`,
+          'Feels Like': `${obs.feels_like.toFixed(1)} °F`,
+          'Humidity': `${obs.relative_humidity.toFixed(0)} %`,
+          'Wind Speed': `${obs.wind_speed.toFixed(1)} mph`,
+          'Wind Gust': `${obs.wind_gust.toFixed(1)} mph`,
+          'Pressure': `${obs.station_pressure.toFixed(2)} inHg`
+        };
+
+        const container = document.getElementById('stats');
+        container.innerHTML = '';
+        for (const [k, v] of Object.entries(stats)) {
+          const div = document.createElement('div');
+          div.className = 'stat';
+          div.innerHTML = `<span class="label">${k}</span><span class="value">${v}</span>`;
+          container.appendChild(div);
+        }
+
+        const dt = new Date(obs.timestamp * 1000);
+        document.getElementById('updated')
+          .textContent = `Last updated: ${dt.toLocaleString()}`;
+      }
+      catch (err) {
+        console.error(err);
+        document.getElementById('stats')
+          .innerHTML = '<div style="color:red;">Error fetching data</div>';
+      }
+    }
+
+    fetchCurrent();
+    setInterval(fetchCurrent, 60 * 1000);
+  </script>
+</body>
+</html>
