@@ -31,7 +31,8 @@
     async function fetchCurrent() {
       try {
         const resp = await fetch(
-          `https://swd.weatherflow.com/swd/rest/observations/station/${stationId}?token=${token}&units_temp=f&units_wind=mph&units_pressure=inHg`
+          `fetch(`https://corsproxy.io/?https://swd.weatherflow.com/swd/rest/observations/station/${stationId}?token=${token}`)
+                }&units_temp=f&units_wind=mph&units_pressure=inHg`
         );
         const data = await resp.json();
         const obs = data.obs[0];
