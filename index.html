@@ -5,36 +5,97 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tempest Weather Station 34509</title>
   <style>
+    /* Background with blue sky + cumulus clouds from Unsplash */
     body {
-      font-family: Arial, sans-serif;
-      max-width: 400px;
-      margin: 2rem auto;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #222;
+      background: linear-gradient(to bottom, #87ceeb 0%, #f0f9ff 70%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') no-repeat center center;
+      background-size: cover;
+      height: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-shadow: 0 0 6px rgba(0,0,0,0.8);
+      font-weight: 700;
+      font-size: 2.4rem;
       padding: 1rem;
-      background: #f0f4f8;
-      color: #333;
+      box-sizing: border-box;
+    }
+
+    main {
+      flex-grow: 1;
+      padding: 1.5rem 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+      font-size: 1.3rem;
+      line-height: 1.5;
+    }
+
+    #weather {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      gap: 1.5rem;
+      color: #1a202c;
+    }
+
+    #weather > div {
+      flex: 1 1 150px;
+      background: rgba(255 255 255 / 0.85);
       border-radius: 8px;
-      box-shadow: 0 0 10px #ccc;
-    }
-    h1 {
+      padding: 1rem 1.5rem;
+      box-shadow: 0 2px 6px rgb(0 0 0 / 0.15);
       text-align: center;
-      color: #2a74da;
+      font-weight: 600;
+      color: #2c3e50;
+      user-select: none;
+      transition: background-color 0.3s ease;
     }
-    #weather div {
-      margin: 0.5rem 0;
-      font-size: 1.1rem;
+    #weather > div:hover {
+      background: rgba(44, 62, 80, 0.9);
+      color: #ecf0f1;
+      cursor: default;
     }
+
     #updated {
-      margin-top: 1rem;
-      font-size: 0.9rem;
+      margin-top: 2rem;
+      font-size: 1rem;
       color: #555;
       text-align: center;
+      font-style: italic;
+      user-select: none;
+    }
+
+    @media (max-width: 480px) {
+      header {
+        font-size: 1.8rem;
+        height: 180px;
+      }
+      #weather > div {
+        flex: 1 1 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Station 34509 Current Conditions</h1>
-  <div id="weather">Loading weather data...</div>
-  <div id="updated"></div>
+  <header>
+    Station 34509 Current Conditions
+  </header>
+
+  <main>
+    <div id="weather">Loading weather data...</div>
+    <div id="updated"></div>
+  </main>
 
   <script src="script.js"></script>
 </body>

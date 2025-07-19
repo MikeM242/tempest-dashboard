@@ -17,12 +17,25 @@ async function loadData() {
       return (val !== undefined && val !== null) ? val.toFixed(decimals) : 'N/A';
     }
 
+    // Conversion helpers
+    function cToF(c) {
+      return c !== undefined && c !== null ? c * 9 / 5 + 32 : null;
+    }
+
+    // Pressure: inHg to mb (1 inHg = 33.8639 mb)
+    function inHgTomb(inHg) {
+      return inHg !== undefined && inHg !== null ? inHg * 33.8639 : null;
+    }
+
+    const tempF = cToF(obs.air_temperature);
+    const feelsF = cToF(obs.feels_like ?? obs.air_temperature);
+
     weatherEl.innerHTML = `
-      <div>Temperature: ${fmtNum(obs.air_temperature)} °F</div>
-      <div>Feels Like: ${fmtNum(obs.feels_like ?? obs.air_temperature)} °F</div>
-      <div>Humidity: ${obs.relative_humidity ?? 'N/A'}%</div>
-      <div>Wind Speed: ${fmtNum(obs.wind_speed)} mph</div>
-      <div>Pressure: ${fmtNum(obs.station_pressure, 2)} inHg</div>
+      <div>Temperature:<br><strong>${fmtNum(tempF)} °F</strong></div>
+      <div>Feels Like:<br><strong>${fmtNum(feelsF)} °F</strong></div>
+      <div>Humidity:<br><strong>${obs.relative_humidity ?? 'N/A'}%</strong></div>
+      <div>Wind Speed:<br><strong>${fmtNum(obs.wind_speed)} mph</strong></div>
+      <div>Pressure:<br><strong>${fmtNum(inHgTomb(obs.station_pressure), 2)} mb</strong></div>
     `;
 
     if (obs.timestamp) {
