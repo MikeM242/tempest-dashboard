@@ -12,6 +12,7 @@ async function loadData() {
     const fmt = (v, d = 1) => v != null ? v.toFixed(d) : 'N/A';
     const c2f = c => c != null ? (c * 9 / 5 + 32) : null;
     const mmToIn = mm => mm != null ? (mm * 0.0393701) : null;
+    const kmToMi = km => km != null ? (km * 0.621371).toFixed(1) : 'N/A';
 
     const rainRateIn = mmToIn(obs.precip_rate);
     const totalRainIn = mmToIn(obs.precip_total);
@@ -20,30 +21,34 @@ async function loadData() {
       : rainRateIn <= 0.1 ? 'Light'
       : rainRateIn <= 0.3 ? 'Moderate' : 'Heavy';
 
-    const windSpeed = obs.wind_speed != null ? fmt(obs.wind_speed) : '0';
+    const windSpeed = obs.wind_avg != null ? fmt(obs.wind_avg, 1) : '0.0';
+    const windGust = obs.wind_gust != null ? fmt(obs.wind_gust, 1) : 'N/A';
+
     const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
     const windDir = obs.wind_direction != null
       ? dirs[Math.floor(((obs.wind_direction + 11.25) % 360) / 22.5)]
       : 'N/A';
 
-    const lightning = obs.strike_count_last_3hr || 0;
-    const lightningDist = obs.strike_last_dist != null
-      ? `${(obs.strike_last_dist * 0.621371).toFixed(1)} mi`
-      : 'N/A';
+    const lightningCount = obs.strike_count_last_3hr || 0;
+    const lightningDist = kmToMi(obs.strike_last_dist);
     const lightningAge = obs.strike_last_epoch != null
-      ? `${Math.round((Date.now() / 1000 - obs.strike_last_epoch) / 60)} min ago`
+      ? Date.now() / 1000 - obs.strike_last_epoch
+      : null;
+    const lightningDate = obs.strike_last_epoch != null
+      ? new Date(obs.strike_last_epoch * 1000).toLocaleString()
       : 'N/A';
 
     weatherEl.innerHTML = `
       <div class="tile">🌡 Temp: <strong>${fmt(c2f(obs.air_temperature))} °F</strong></div>
       <div class="tile">🤒 Feels Like: <strong>${fmt(c2f(obs.feels_like ?? obs.air_temperature))} °F</strong></div>
       <div class="tile">💧 Humidity: <strong>${obs.relative_humidity ?? 'N/A'}%</strong></div>
-      <div class="tile">🌬 Wind: <strong>${windSpeed} mph ${windDir}</strong></div>
+      <div class="tile">🌬 Wind: <strong>${windSpeed} mph ${windDir} (Gusts: ${windGust} mph)</strong></div>
       <div class="tile">🔻 Pressure: <strong>${fmt(obs.station_pressure, 2)} mb</strong></div>
       <div class="tile">🌧 Rain Intensity: <strong>${rainDesc}</strong></div>
       <div class="tile">🌧 Total Rain Today: <strong>${fmt(totalRainIn, 2)} in</strong></div>
-      <div class="tile">⚡ Lightning: <strong>${lightning} strikes</strong></div>
-      <div class="tile">📍 Last strike: <strong>${lightningDist}, ${lightningAge}</strong></div>
+      <div class="tile">⚡ Lightning Count: <strong>${lightningCount}</strong></div>
+      <div class="tile">📍 Last Lightning Strike: <strong>${lightningDist} mi</strong></div>
+      <div class="tile">🕒 Last Lightning Time: <strong>${lightningDate}</strong></div>
       <div class="tile" id="nws-sky-tile">☁ Sky (NWS): <strong>Loading...</strong></div>
     `;
 
@@ -72,16 +77,17 @@ async function fetchSky() {
       const html = await resp.text();
       const div = document.createElement('div');
       div.innerHTML = html;
-      const tds = div.querySelectorAll('td');
-      for (let i = 0; i < tds.length; i++) {
-        if (tds[i].textContent.trim() === 'Weather' && tds[i + 1]) {
-          sky = tds[i + 1].textContent.trim();
+      const trs = div.querySelectorAll('tr');
+      for (const tr of trs) {
+        const tds = tr.querySelectorAll('td');
+        if (tds.length >= 2 && tds[0].textContent.trim() === 'Weather') {
+          sky = tds[1].textContent.trim();
           break;
         }
       }
       if (sky !== 'N/A') break;
-    } catch (err) {
-      console.warn('Sky fetch failed from', url, err);
+    } catch (e) {
+      console.warn('Sky fetch failed from', url, e);
     }
   }
 
