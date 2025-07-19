@@ -4,94 +4,79 @@ async function loadData() {
 
   try {
     const resp = await fetch('data.json');
-    if (!resp.ok) throw new Error(`HTTP error ${resp.status}`);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const data = await resp.json();
+    if (!data.obs || !data.obs.length) throw new Error('No obs');
 
-    if (!data.obs || !data.obs.length) {
-      throw new Error('No observation data found');
-    }
     const obs = data.obs[0];
+    const fmt = (v, d=1)=> (v!=null? v.toFixed(d): 'N/A');
+    const cToF = c=> c!=null? c*9/5+32 : null;
+    const tempF = cToF(obs.air_temperature), feelsF = cToF(obs.feels_like ?? obs.air_temperature);
+    const windSpeed = obs.wind_speed != null ? fmt(obs.wind_speed) : '0';
+    const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+    const windDir = obs.wind_direction!=null? dirs[Math.floor(((obs.wind_direction+11.25)%360)/22.5)] : 'N/A';
+    const pressure = obs.station_pressure!=null? fmt(obs.station_pressure,2): 'N/A';
 
-    const fmtNum = (val, decimals = 1) =>
-      val !== undefined && val !== null ? val.toFixed(decimals) : 'N/A';
+    const rateIn = obs.precip_rate!=null? obs.precip_rate*0.0393701 : null;
+    const totalIn = obs.precip_accum_local_day!=null? obs.precip_accum_local_day*0.0393701 : null;
+    const rainDesc = (rateIn==null||rateIn===0)?'None':
+                     rateIn<=0.1?'Light':
+                     rateIn<=0.3?'Moderate':'Heavy';
+    const rainTotal = totalIn!=null? `${fmt(totalIn)} in` : 'N/A';
 
-    // Convert °C to °F
-    const tempF = obs.air_temperature !== null ? (obs.air_temperature * 9) / 5 + 32 : null;
-    const feelsF = (obs.feels_like ?? obs.air_temperature) !== null ? ((obs.feels_like ?? obs.air_temperature) * 9) / 5 + 32 : null;
+    const lightning = data.strike_stats || {};
+    const strikes = lightning.strikes||0;
+    const dist = lightning.closest_strike_distance||'N/A';
+    const ago = lightning.closest_strike_age;
+    const timeAgo = (ago==null)? 'N/A' :
+                     ago<60? `${ago} sec ago` : `${Math.round(ago/60)} min ago`;
+    const lightningHtml = `<div>Strikes: <strong>${strikes}</strong></div>
+                           <div>Closest: <strong>${dist} km</strong></div>
+                           <div>Last: <strong>${timeAgo}</strong></div>`;
 
-    // Wind speed: show 0 if null/undefined
-    const windSpeed = obs.wind_speed != null ? fmtNum(obs.wind_speed) : '0';
-
-    // Wind direction cardinal only
-    function degToCardinal(deg) {
-      if (deg == null) return 'N/A';
-      const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE',
-                          'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
-      const index = Math.floor(((deg + 11.25) % 360) / 22.5);
-      return directions[index];
-    }
-    const windDir = obs.wind_direction != null ? degToCardinal(obs.wind_direction) : 'N/A';
-
-    // Pressure in millibars (no conversion)
-    const pressure = obs.station_pressure != null ? fmtNum(obs.station_pressure, 2) : 'N/A';
-
-    // Convert rain from mm to inches: 1 mm = 0.0393701 in
-    const mmToIn = (mm) => mm !== undefined && mm !== null ? mm * 0.0393701 : null;
-
-    const rainRateIn = mmToIn(obs.precip_rate);
-    const rainTodayIn = mmToIn(obs.precip_accum_local_day);
-
-    const rainRate = rainRateIn !== null ? `${fmtNum(rainRateIn)} in/hr` : 'N/A';
-    const rainToday = rainTodayIn !== null ? `${fmtNum(rainTodayIn)} in` : 'N/A';
-
-    // Lightning strikes
-    const lightning = data.strike_stats ?? null;
-    let lightningHtml = 'No recent lightning data';
-    if (lightning) {
-      const strikes = lightning.strikes ?? 0;
-      const dist = lightning.closest_strike_distance ?? 'N/A';
-      const agoSeconds = lightning.closest_strike_age ?? null;
-
-      let timeAgo = 'N/A';
-      if (agoSeconds !== null) {
-        if (agoSeconds < 60) timeAgo = `${agoSeconds} sec ago`;
-        else timeAgo = `${Math.round(agoSeconds / 60)} min ago`;
-      }
-
-      lightningHtml = `
-        <div>Strikes: <strong>${strikes}</strong></div>
-        <div>Closest strike distance: <strong>${dist} km</strong></div>
-        <div>Last strike: <strong>${timeAgo}</strong></div>
-      `;
-    }
+    const skyCond = obs.weather ?? 'N/A';
 
     weatherEl.innerHTML = `
-      <div>Temperature:<br><strong>${tempF !== null ? fmtNum(tempF) + ' °F' : 'N/A'}</strong></div>
-      <div>Feels Like:<br><strong>${feelsF !== null ? fmtNum(feelsF) + ' °F' : 'N/A'}</strong></div>
-      <div>Humidity:<br><strong>${obs.relative_humidity ?? 'N/A'}%</strong></div>
-      <div>Wind Speed:<br><strong>${windSpeed} mph</strong></div>
-      <div>Wind Direction:<br><strong>${windDir}</strong></div>
-      <div>Pressure:<br><strong>${pressure} mb</strong></div>
-      <div>Rain Rate:<br><strong>${rainRate}</strong></div>
-      <div>Rain Today:<br><strong>${rainToday}</strong></div>
-      <div style="min-width: 200px;">
-        <strong>Lightning:</strong>
-        ${lightningHtml}
-      </div>
+      <div>🌡 Temp:<br><strong>${tempF!=null?fmt(tempF)+' °F':'N/A'}</strong></div>
+      <div>🤒 Feels Like:<br><strong>${feelsF!=null?fmt(feelsF)+' °F':'N/A'}</strong></div>
+      <div>💧 Humidity:<br><strong>${obs.relative_humidity??'N/A'}%</strong></div>
+      <div>🌬 Wind Speed:<br><strong>${windSpeed} mph</strong></div>
+      <div>🧭 Wind Dir:<br><strong>${windDir}</strong></div>
+      <div>🔻 Pressure:<br><strong>${pressure} mb</strong></div>
+      <div>🌧 Rain Intensity:<br><strong>${rainDesc}</strong></div>
+      <div>🪣 Rain Today:<br><strong>${rainTotal}</strong></div>
+      <div>☁ Sky Conditions:<br><strong>${skyCond}</strong></div>
+      <div style="min-width:200px"><strong>⚡ Lightning:</strong>${lightningHtml}</div>
     `;
 
     if (obs.timestamp) {
-      const updatedDate = new Date(obs.timestamp * 1000);
-      updatedEl.textContent = `Last updated: ${updatedDate.toLocaleString()}`;
-    } else {
-      updatedEl.textContent = 'Last updated: N/A';
-    }
+      updatedEl.textContent = `Last updated: ${new Date(obs.timestamp *1000).toLocaleString()}`;
+    } else updatedEl.textContent = 'Last updated: N/A';
+
   } catch (err) {
-    console.error('Error loading weather data:', err);
+    console.error(err);
     weatherEl.textContent = 'Error loading data';
     updatedEl.textContent = '';
   }
 }
 
+function fetchSky() {
+  fetch('https://corsproxy.io/?https://forecast.weather.gov/data/obhistory/KFRG.html')
+    .then(r=>r.text()).then(htmlText=>{
+      const div = document.createElement('div');
+      div.innerHTML = htmlText;
+      const td = Array.from(div.querySelectorAll('td'))
+        .find(el=>el.textContent.trim() === 'Weather')?.nextElementSibling;
+      const sky = td? td.textContent.trim():'N/A';
+      document.getElementById('sky-from-nws').textContent = sky;
+    })
+    .catch(err=>{
+      console.error('Sky fetch error', err);
+      document.getElementById('sky-from-nws').textContent = 'N/A';
+    });
+}
+
 loadData();
-setInterval(loadData, 5 * 60 * 1000); // Refresh every 5 minutes
+fetchSky();
+setInterval(loadData, 5*60*1000);
+setInterval(fetchSky, 10*60*1000);

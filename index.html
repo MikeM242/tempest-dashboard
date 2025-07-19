@@ -1,101 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tempest Weather Station 34509</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Tempest Station 34509</title>
   <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #222;
-      background: linear-gradient(to bottom, #87ceeb 0%, #f0f9ff 70%);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+    body { margin:0; font:Segoe UI, sans-serif; color:#222;
+      background: linear-gradient(to bottom,#a7d8de 0%,#f0f9ff 70%);
+      min-height:100vh; display:flex; flex-direction:column;
     }
-
     header {
-      background: url('https://images.unsplash.com/photo-1500534623283-312aade485b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') no-repeat center center;
-      background-size: cover;
-      height: 250px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      text-shadow: 0 0 6px rgba(0,0,0,0.8);
-      font-weight: 700;
-      font-size: 2.4rem;
-      padding: 1rem;
-      box-sizing: border-box;
+      background:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80')
+        center/cover no-repeat;
+      height:250px; display:flex; justify-content:center;
+      align-items:center; color:white; font:2.4rem bold;
+      text-shadow:0 0 6px rgba(0,0,0,0.8); padding:1rem;
     }
-
-    main {
-      flex-grow: 1;
-      padding: 1.5rem 2rem;
-      max-width: 900px;
-      margin: 0 auto;
-      font-size: 1.3rem;
-      line-height: 1.5;
+    main {flex:1; padding:1.5rem; max-width:900px; margin:0 auto;}
+    #weather {display:flex; flex-wrap:wrap; gap:1.5rem;}
+    #weather>div {
+      background:rgba(255 255 255/0.85);flex:1 1 150px;
+      border-radius:8px;padding:1rem;text-align:center;
+      font:1.1rem bold;color:#2c3e50;
     }
-
-    #weather {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-around;
-      gap: 1.5rem;
-      color: #1a202c;
+    #weather>div:hover {background:#2c3e50;color:#ecf0f1;}
+    #updated,{#sky-label,#sky-from-nws} {
+      margin-top:2rem;text-align:center;font-size:1rem;color:#555;
     }
-
-    #weather > div {
-      flex: 1 1 150px;
-      background: rgba(255 255 255 / 0.85);
-      border-radius: 8px;
-      padding: 1rem 1.5rem;
-      box-shadow: 0 2px 6px rgb(0 0 0 / 0.15);
-      text-align: center;
-      font-weight: 600;
-      color: #2c3e50;
-      user-select: none;
-      transition: background-color 0.3s ease;
-    }
-    #weather > div:hover {
-      background: rgba(44, 62, 80, 0.9);
-      color: #ecf0f1;
-      cursor: default;
-    }
-
-    #updated {
-      margin-top: 2rem;
-      font-size: 1rem;
-      color: #555;
-      text-align: center;
-      font-style: italic;
-      user-select: none;
-    }
-
-    @media (max-width: 480px) {
-      header {
-        font-size: 1.8rem;
-        height: 180px;
-      }
-      #weather > div {
-        flex: 1 1 100%;
-      }
-    }
+    #sky-label {font-weight:600;}
+    @media(max-width:480px){#weather>div{flex:1 1 100%;}header{height:180px;font-size:1.8rem;}}
   </style>
 </head>
 <body>
-  <header>
-    Station 34509 Current Conditions
-  </header>
-
+  <header>Ernest Court Current Conditions</header>
   <main>
     <div id="weather">Loading weather data...</div>
     <div id="updated"></div>
+    <div id="sky-label">Sky Conditions (NWS):</div>
+    <div id="sky-from-nws">Loading...</div>
   </main>
-
   <script src="script.js"></script>
 </body>
 </html>
