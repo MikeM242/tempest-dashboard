@@ -10,9 +10,11 @@ async function loadData() {
     if (!obs) throw new Error('No observation data');
 
     const fmt = (v, d = 1) => v != null ? v.toFixed(d) : 'N/A';
-    const c2f = c => c != null ? (c * 9/5 + 32) : null;
+    const c2f = c => c != null ? (c * 9 / 5 + 32) : null;
+    const mmToIn = mm => mm != null ? (mm * 0.0393701) : null;
 
-    const rainRateIn = obs.precip_rate != null ? obs.precip_rate * 0.0393701 : null;
+    const rainRateIn = mmToIn(obs.precip_rate);
+    const totalRainIn = mmToIn(obs.precip_total);
     const rainDesc = (rainRateIn === null || rainRateIn === 0)
       ? 'None'
       : rainRateIn <= 0.1 ? 'Light'
@@ -24,24 +26,25 @@ async function loadData() {
       ? dirs[Math.floor(((obs.wind_direction + 11.25) % 360) / 22.5)]
       : 'N/A';
 
-    const skyDesc = obs.weather ?? 'N/A';
-
     const lightning = obs.strike_count_last_3hr || 0;
-    const lightningDist = obs.strike_last_dist != null ? `${obs.strike_last_dist} km` : 'N/A';
+    const lightningDist = obs.strike_last_dist != null
+      ? `${(obs.strike_last_dist * 0.621371).toFixed(1)} mi`
+      : 'N/A';
     const lightningAge = obs.strike_last_epoch != null
-      ? `${Math.round((Date.now()/1000 - obs.strike_last_epoch) / 60)} min ago`
+      ? `${Math.round((Date.now() / 1000 - obs.strike_last_epoch) / 60)} min ago`
       : 'N/A';
 
     weatherEl.innerHTML = `
-      <div>🌡 Temp: <strong>${fmt(c2f(obs.air_temperature))} °F</strong></div>
-      <div>🤒 Feels Like: <strong>${fmt(c2f(obs.feels_like ?? obs.air_temperature))} °F</strong></div>
-      <div>💧 Humidity: <strong>${obs.relative_humidity ?? 'N/A'}%</strong></div>
-      <div>🌬 Wind: <strong>${windSpeed} mph ${windDir}</strong></div>
-      <div>🔻 Pressure: <strong>${fmt(obs.station_pressure, 2)} mb</strong></div>
-      <div>🌧 Rain: <strong>${rainDesc}</strong></div>
-      <div>🌦 Sky: <strong>${skyDesc}</strong></div>
-      <div>⚡ Lightning: <strong>${lightning} strikes</strong></div>
-      <div>📍 Last strike: <strong>${lightningDist}, ${lightningAge}</strong></div>
+      <div class="tile">🌡 Temp: <strong>${fmt(c2f(obs.air_temperature))} °F</strong></div>
+      <div class="tile">🤒 Feels Like: <strong>${fmt(c2f(obs.feels_like ?? obs.air_temperature))} °F</strong></div>
+      <div class="tile">💧 Humidity: <strong>${obs.relative_humidity ?? 'N/A'}%</strong></div>
+      <div class="tile">🌬 Wind: <strong>${windSpeed} mph ${windDir}</strong></div>
+      <div class="tile">🔻 Pressure: <strong>${fmt(obs.station_pressure, 2)} mb</strong></div>
+      <div class="tile">🌧 Rain Intensity: <strong>${rainDesc}</strong></div>
+      <div class="tile">🌧 Total Rain Today: <strong>${fmt(totalRainIn, 2)} in</strong></div>
+      <div class="tile">⚡ Lightning: <strong>${lightning} strikes</strong></div>
+      <div class="tile">📍 Last strike: <strong>${lightningDist}, ${lightningAge}</strong></div>
+      <div class="tile" id="nws-sky-tile">☁ Sky (NWS): <strong>Loading...</strong></div>
     `;
 
     updatedEl.textContent = obs.timestamp
@@ -50,7 +53,7 @@ async function loadData() {
 
   } catch (e) {
     console.error('Error loading weather data:', e);
-    weatherEl.textContent = 'Error loading data';
+    weatherEl.innerHTML = `<div class="tile">Error loading data</div>`;
   }
 }
 
@@ -82,7 +85,8 @@ async function fetchSky() {
     }
   }
 
-  document.getElementById('sky-from-nws').textContent = sky;
+  const tile = document.getElementById('nws-sky-tile');
+  if (tile) tile.innerHTML = `☁ Sky (NWS): <strong>${sky}</strong>`;
 }
 
 // Initial load
