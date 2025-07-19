@@ -9,10 +9,10 @@
   "longitude": -73.53323,
   "obs": [
     {
-      "air_density": 1.17602,
+      "air_density": 1.1759,
       "air_temperature": 27.1,
-      "barometric_pressure": 1013.6,
-      "brightness": 33254,
+      "barometric_pressure": 1013.5,
+      "brightness": 39737,
       "delta_t": 4.2,
       "dew_point": 21.2,
       "feels_like": 29.0,
@@ -34,17 +34,17 @@
       "precip_minutes_local_yesterday_final": 0,
       "pressure_trend": "falling",
       "relative_humidity": 70,
-      "sea_level_pressure": 1016.6,
-      "solar_radiation": 278,
-      "station_pressure": 1013.6,
-      "timestamp": 1752957568,
-      "uv": 2.64,
-      "wet_bulb_globe_temperature": 25.9,
+      "sea_level_pressure": 1016.5,
+      "solar_radiation": 332,
+      "station_pressure": 1013.5,
+      "timestamp": 1752958528,
+      "uv": 3.14,
+      "wet_bulb_globe_temperature": 26.3,
       "wet_bulb_temperature": 22.9,
-      "wind_avg": 0.1,
+      "wind_avg": 0.3,
       "wind_chill": 27.1,
-      "wind_direction": 160,
-      "wind_gust": 0.4,
+      "wind_direction": 243,
+      "wind_gust": 1.1,
       "wind_lull": 0.0
     }
   ],
@@ -97,5 +97,5 @@
     "units_wind": "mph"
   },
   "timezone": "America/New_York",
-  "update_time": "2025-07-19T20:40:24Z"
+  "update_time": "2025-07-19T20:55:55Z"
 }
