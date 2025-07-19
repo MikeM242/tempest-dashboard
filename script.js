@@ -12,19 +12,28 @@ async function loadData() {
     }
     const obs = data.obs[0];
 
+    // Helper to format numbers safely
+    function fmtNum(val, decimals = 1) {
+      return (val !== undefined && val !== null) ? val.toFixed(decimals) : 'N/A';
+    }
+
     weatherEl.innerHTML = `
-      <div>Temperature: ${obs.air_temperature?.toFixed(1)} °F</div>
-      <div>Feels Like: ${obs.feels_like?.toFixed(1) ?? obs.air_temperature.toFixed(1)} °F</div>
-      <div>Humidity: ${obs.relative_humidity}%</div>
-      <div>Wind Speed: ${obs.wind_speed?.toFixed(1)} mph</div>
-      <div>Pressure: ${obs.station_pressure?.toFixed(2)} inHg</div>
+      <div>Temperature: ${fmtNum(obs.air_temperature)} °F</div>
+      <div>Feels Like: ${fmtNum(obs.feels_like ?? obs.air_temperature)} °F</div>
+      <div>Humidity: ${obs.relative_humidity ?? 'N/A'}%</div>
+      <div>Wind Speed: ${fmtNum(obs.wind_speed)} mph</div>
+      <div>Pressure: ${fmtNum(obs.station_pressure, 2)} inHg</div>
     `;
 
-    const updatedDate = new Date(obs.timestamp * 1000);
-    updatedEl.textContent = `Last updated: ${updatedDate.toLocaleString()}`;
+    if (obs.timestamp) {
+      const updatedDate = new Date(obs.timestamp * 1000);
+      updatedEl.textContent = `Last updated: ${updatedDate.toLocaleString()}`;
+    } else {
+      updatedEl.textContent = 'Last updated: N/A';
+    }
 
   } catch (err) {
-    console.error('Error loading data:', err);
+    console.error('Error loading weather data:', err);
     weatherEl.textContent = 'Error loading data';
     updatedEl.textContent = '';
   }
