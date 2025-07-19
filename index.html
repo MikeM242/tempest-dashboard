@@ -2,71 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My Tempest Station</title>
-  <style>
-    body { font-family: sans-serif; margin: 1rem; background: #eef2f5; color: #333; }
-    .card { background: white; padding: 1rem; max-width: 400px; margin: auto;
-            border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    h2 { margin-top: 0; }
-    .stat { display: flex; justify-content: space-between; padding: 0.5rem 0; }
-    .label { color: #555; }
-    .value { font-weight: bold; }
-    .timestamp { text-align: center; font-size: 0.9rem; color: #777; margin-top: 1rem; }
-  </style>
+  <title>Tempest Station Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="card">
-    <h2>Station 34509 Current Conditions</h2>
-    <div id="stats">
-      <!-- Stats get filled in here -->
-    </div>
-    <div id="updated" class="timestamp">Last updated: —</div>
+    <h2>Station 34509</h2>
+    <div id="weather">Loading...</div>
+    <div id="updated" class="timestamp"></div>
   </div>
-
-  <script>
-  const token = '6e0530d0-40ff-42d6-a258-357526e2be11';
-  const stationId = '34509';
-
-  async function fetchCurrent() {
-    try {
-      const proxy = 'https://corsproxy.io/?';
-      const url = `https://swd.weatherflow.com/swd/rest/observations/station/${stationId}?token=${token}`;
-      const response = await fetch(proxy + url);
-      const data = await response.json();
-
-      const obs = data.obs?.[0];
-      if (!obs) throw new Error('No observation data');
-
-      const stats = {
-        'Temperature': `${obs.air_temperature.toFixed(1)} °F`,
-        'Feels Like': `${obs.feels_like.toFixed(1)} °F`,
-        'Humidity': `${obs.relative_humidity.toFixed(0)} %`,
-        'Wind Speed': `${obs.wind_speed.toFixed(1)} mph`,
-        'Wind Gust': `${obs.wind_gust.toFixed(1)} mph`,
-        'Pressure': `${obs.station_pressure.toFixed(2)} inHg`
-      };
-
-      const container = document.getElementById('stats');
-      container.innerHTML = '';
-      for (const [key, value] of Object.entries(stats)) {
-        const row = document.createElement('div');
-        row.className = 'stat';
-        row.innerHTML = `<span class="label">${key}</span><span class="value">${value}</span>`;
-        container.appendChild(row);
-      }
-
-      const updated = new Date(obs.timestamp * 1000).toLocaleString();
-      document.getElementById('updated').textContent = `Last updated: ${updated}`;
-    } catch (error) {
-      console.error(error);
-      document.getElementById('stats').innerHTML = '<div style="color:red;">Error fetching data</div>';
-    }
-  }
-
-  fetchCurrent();
-  setInterval(fetchCurrent, 60000);
-</script>
-
+  <script src="script.js"></script>
 </body>
 </html>
