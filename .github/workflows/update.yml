@@ -2,30 +2,32 @@ name: Update Tempest Data
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
-  workflow_dispatch:
+    - cron: '*/5 * * * *'   # Every 5 minutes, UTC time
+  workflow_dispatch:       # Allows manual trigger from GitHub UI
 
 jobs:
-  fetch:
+  update:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write  # 🔑 Allow push
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Fetch station data
-        env:
-          TOKEN: ${{ secrets.TEMPEST_TOKEN }}
-          STATION: '34509'
+      - name: Fetch weather data
         run: |
-          curl -s "https://swd.weatherflow.com/swd/rest/observations/station/${STATION}?token=${TOKEN}" > data.json
+          TOKEN="6e0530d0-40ff-42d6-a258-357526e2be11"
+          curl -s "https://swd.weatherflow.com/swd/rest/observations/station/34509?token=$TOKEN" -o data.json
 
-      - name: Commit and push
+      - name: Add timestamp to data.json
+        run: |
+          # Append a current timestamp to force change
+          jq '. + {"update_time": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' data.json > data_tmp.json
+          mv data_tmp.json data.json
+
+      - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data.json
-          git commit -m "Update data.json" || echo "No changes to commit"
-          git push origin main
+          git commit -m "Update data.json with latest data and timestamp" || echo "No changes to commit"
+          git push
