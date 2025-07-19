@@ -2,15 +2,40 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Tempest Station Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tempest Weather Station 34509</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 400px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: #f0f4f8;
+      color: #333;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #ccc;
+    }
+    h1 {
+      text-align: center;
+      color: #2a74da;
+    }
+    #weather div {
+      margin: 0.5rem 0;
+      font-size: 1.1rem;
+    }
+    #updated {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #555;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Station 34509</h2>
-    <div id="weather">Loading...</div>
-    <div id="updated" class="timestamp"></div>
-  </div>
+  <h1>Station 34509 Current Conditions</h1>
+  <div id="weather">Loading weather data...</div>
+  <div id="updated"></div>
+
   <script src="script.js"></script>
 </body>
 </html>
