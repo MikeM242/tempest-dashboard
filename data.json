@@ -9,14 +9,14 @@
   "longitude": -73.53323,
   "obs": [
     {
-      "air_density": 1.16989,
-      "air_temperature": 29.0,
-      "barometric_pressure": 1014.7,
-      "brightness": 42500,
-      "delta_t": 5.8,
-      "dew_point": 20.7,
-      "feels_like": 31.2,
-      "heat_index": 31.2,
+      "air_density": 1.17055,
+      "air_temperature": 28.8,
+      "barometric_pressure": 1014.6,
+      "brightness": 19181,
+      "delta_t": 5.6,
+      "dew_point": 20.8,
+      "feels_like": 31.0,
+      "heat_index": 31.0,
       "lightning_strike_count": 0,
       "lightning_strike_count_last_1hr": 0,
       "lightning_strike_count_last_3hr": 0,
@@ -33,19 +33,19 @@
       "precip_minutes_local_yesterday": 0,
       "precip_minutes_local_yesterday_final": 0,
       "pressure_trend": "steady",
-      "relative_humidity": 61,
-      "sea_level_pressure": 1017.7,
-      "solar_radiation": 354,
-      "station_pressure": 1014.7,
-      "timestamp": 1752950190,
-      "uv": 3.36,
-      "wet_bulb_globe_temperature": 26.7,
+      "relative_humidity": 62,
+      "sea_level_pressure": 1017.6,
+      "solar_radiation": 160,
+      "station_pressure": 1014.6,
+      "timestamp": 1752951090,
+      "uv": 1.52,
+      "wet_bulb_globe_temperature": 25.6,
       "wet_bulb_temperature": 23.2,
-      "wind_avg": 0.7,
-      "wind_chill": 29.0,
-      "wind_direction": 313,
-      "wind_gust": 1.0,
-      "wind_lull": 0.2
+      "wind_avg": 0.8,
+      "wind_chill": 28.8,
+      "wind_direction": 239,
+      "wind_gust": 1.1,
+      "wind_lull": 0.3
     }
   ],
   "outdoor_keys": [
@@ -97,5 +97,5 @@
     "units_wind": "mph"
   },
   "timezone": "America/New_York",
-  "update_time": "2025-07-19T18:36:51Z"
+  "update_time": "2025-07-19T18:51:35Z"
 }
